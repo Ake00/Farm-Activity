@@ -1,0 +1,76 @@
+import java.io.*;
+
+public class CreateCustomerFile {
+    public static void main(String[] args) {
+        String filename = "customers.txt";
+        File file = new File(filename);
+        
+        try {
+            // Create a new file if it doesn't exist
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            
+            // Open a file writer to write to the file
+            FileWriter writer = new FileWriter(file);
+            
+            // Prompt the user to enter customer data
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            String line;
+            boolean invalid = false;
+            
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                
+                // Validate the input data
+                if (parts.length != 3) {
+                    System.out.println("Invalid data format. Please enter ID, last name, and zip code separated by commas.");
+                    invalid = true;
+                }
+                
+                int id = Integer.parseInt(parts[0]);
+                String lastName = parts[1];
+                int zipCode = Integer.parseInt(parts[2]);
+                
+                if (lastName.length() < 6 || lastName.length() > 6) {
+                    System.out.println("Last name must be 6 characters long.");
+                    invalid = true;
+                }
+                
+                // Check if the ID number already exists
+                BufferedReader fileReader = new BufferedReader(new FileReader(file));
+                String fileLine;
+                boolean exists = false;
+                
+                while ((fileLine = fileReader.readLine()) != null) {
+                    String[] fileParts = fileLine.split(",");
+                    int fileId = Integer.parseInt(fileParts[0]);
+                    
+                    if (id == fileId) {
+                        System.out.println("ID number already exists.");
+                        exists = true;
+                        invalid = true;
+                        break;
+                    }
+                }
+                
+                fileReader.close();
+                
+                if (invalid) {
+                    continue;
+                }
+                
+                // Write the customer data to the file
+                String customerLine = String.format("%03d,%-6s,%05d\n", id, lastName, zipCode);
+                writer.write(customerLine);
+                writer.flush();
+                
+                System.out.println("Customer added to file.");
+            }
+            
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
