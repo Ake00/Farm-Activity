@@ -1,0 +1,39 @@
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String[] args) {
+        try {
+            // Create a new server socket and bind it to a port
+            ServerSocket serverSocket = new ServerSocket(1900);
+            
+            // Wait for a client to connect
+            System.out.println("Waiting for client...");
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("Client connected!");
+            
+            // Create input and output streams for the client socket
+            InputStream input = clientSocket.getInputStream();
+            OutputStream output = clientSocket.getOutputStream();
+            
+            // Read a message from the client
+            byte[] buffer = new byte[1024];
+            int bytesRead = input.read(buffer);
+            String message = new String(buffer, 0, bytesRead);
+            System.out.println("Client says: " + message);
+            
+            // Send a response to the client
+            output.write("Hello, client!".getBytes());
+            
+            // Close the client socket and streams
+            input.close();
+            output.close();
+            clientSocket.close();
+            
+            // Close the server socket
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
